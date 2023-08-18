@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="upload">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        /* 스타일 추가 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #fileInputContainer {
+            margin-bottom: 10px;
+        }
+
+        #selectedFiles {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #submitButtonContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -45px;
+            margin-left: 180px;
+        }
+
+        #submitButton {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <form action="/scenario" method="POST" enctype="multipart/form-data">
+        <div id="fileInputContainer">
+            <input type="file" name="file[]" multiple="multiple" id="fileInput" onchange="displaySelectedFiles()"/>
+        </div>
+        <div id="selectedFiles"></div> <!-- 파일 이름들이 이곳에 나타나도록 수정 -->
+        <div id="submitButtonContainer">
+            <input type="submit" id="submitButton" value="Submit">
+        </div>
+    </form>
+
+    <script>
+        function displaySelectedFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const selectedFilesDiv = document.getElementById('selectedFiles');
+            selectedFilesDiv.innerHTML = ''; // Clear previous selections
+
+            for (const file of fileInput.files) {
+                const fileNameDiv = document.createElement('div');
+                fileNameDiv.textContent = file.name;
+                selectedFilesDiv.appendChild(fileNameDiv);
+            }
+        }
+    </script>
+</body>
+</html>

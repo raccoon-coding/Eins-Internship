@@ -1,0 +1,31 @@
+<!-- 시나리오 목록 -->
+<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+<div class="container my-2">
+    <table class="table">
+        <thead>
+        <tr class="table-dark">
+            <th>번호</th>
+            <th>제목</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if number %}
+        {% for i in range(number) %}
+        <tr>
+            <td>{{ i + 1 }}</td>
+            <td>
+                <a href="/detail/{{ i }}/">{{ scenario_name[i] }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="2">시나리오가 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <form method="post" action="/result">
+        <button type="submit">Result</button>
+    </form>
+</div>
