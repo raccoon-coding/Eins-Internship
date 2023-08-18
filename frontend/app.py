@@ -14,6 +14,15 @@ file_name_list = list()
 number = 0
 
 
+def read_csv_and_convert_to_json(csv_path):
+    json_data = []
+    with open(csv_path, 'r', encoding='utf-8-sig') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            json_data.append(row)
+    return json_data
+
+
 @app.route('/')
 def upload_file():
     return render_template('upload.html')
@@ -38,23 +47,41 @@ def scenario_uploads():
             return "you didn't send the file"
 
 
-# @app.route('/result', methods=['POST', 'GET'])
-# def result():
-#     if request.method == 'POST':
-#         directory_path = os.getcwd() + "/result"
-#         for filename in os.listdir(directory_path):
-#             if filename.endswith(".csv"):
-#                 file_path = os.path.join(directory_path, filename)
-#                 with open(file_path, 'rt') as f:
-#                     csv_reader = csv.reader(f, delimiter=',')
-#                     #csv_data = list(csv_reader)
-#     csv_reader = pd.read_csv(file_path)
-#     fig = px.line(csv_reader, x='측정 시작 시각', y='통과차량', title='CSV Data Graph')
-#     return fig.write_html('ResultGraph.html')
-#     #return render_template("ResultGraph.html", csv=csv_data)
-
 @app.route('/result', methods=['POST', 'GET'])
 def result():
+    if request.method == 'POST':
+        directory_path = os.getcwd() + "/result"
+        for filename in os.listdir(directory_path):
+            if filename.endswith(".csv"):
+                file_path = os.path.join(directory_path, filename)
+                with open(file_path, 'rt') as f:
+                    csv_reader = csv.reader(f, delimiter=',')
+                    csv_data = list(csv_reader)
+        return render_template("result.html", csv=csv_data)
+    elif request.method == 'GET':
+        try:
+            format_type = request.args.get('format')
+            directory_path = os.getcwd() + "/result"
+            file_path = directory_path
+            for filename in os.listdir(directory_path):
+                if filename.endswith(".csv"):
+                    file_path = os.path.join(directory_path, filename)
+
+            if not os.path.exists(file_path):
+                return "File not found", 404
+
+            if format_type == 'json':
+                json_data = read_csv_and_convert_to_json(file_path)
+                return jsonify(json_data)
+            else:
+                return send_file(file_path, as_attachment=True)
+
+        except Exception as e:
+            return str(e), 500
+
+
+@app.route('/result_graph', methods=['POST', 'GET'])
+def result_graph():
     if request.method == 'POST':
         directory_path = os.getcwd() + "/result"
         dataframes = []
@@ -89,13 +116,21 @@ def result():
 
 @app.route('/detail/<int:file_name_number>/')
 def detail(file_name_number):
+    format_type = request.args.get('format')
     filename = os.getcwd() + "/save csv/"
-    filename = filename + file_name_list[file_name_number]
-    with open(filename, 'rt') as f:
+    file_path = filename + file_name_list[file_name_number]
+    with open(file_path, 'rt') as f:
         csvd = csv.reader(f, delimiter=',')
         csv_data = list(csvd)  # Read the entire CSV data into a list
-        return render_template("scenario_list.html", csv=csv_data)
 
+    if not os.path.exists(file_path):
+        return "File not found", 404
+
+    if format_type == 'json':
+        json_data = read_csv_and_convert_to_json(file_path)
+        return jsonify(json_data)
+    else:
+        return render_template("scenario_list.html", csv=csv_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
