@@ -35,7 +35,7 @@ class Inputs(Resource):
             for row in csv_reader:
                 json_data.append(row)
         return json_data
-
+    
     def post(self):
         try:
             files_list = request.files.getlist("file[]")
@@ -47,7 +47,7 @@ class Inputs(Resource):
         except Exception as e:
             return str(e), 400
 
-
+          
 # 결과 파일에 대한 API
 class Outputs(Resource):
     def get(self):
