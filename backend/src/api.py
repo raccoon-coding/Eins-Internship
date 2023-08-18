@@ -6,7 +6,8 @@ import os
 
 app = Flask(__name__)
 api = Api(app)
-    
+
+
 # TODO: 일부 파일의 변경이 들어올 때를 고려하기
 class UploadFiles(Resource):
     def get(self):
@@ -25,7 +26,7 @@ class UploadFiles(Resource):
 class DownloadFiles(Resource):
     def get(self):
         try:
-            csv_path = '/home/internship/backend/result/result.csv'  # CSV 파일 경로
+            csv_path = '/Users/choeminseong/Test/Eins-Internship/backend/result/result.csv'  # CSV 파일 경로
             json_data = self.read_csv_and_convert_to_json(csv_path)
             return jsonify(json_data)
         except Exception as e:
@@ -44,4 +45,4 @@ api.add_resource(UploadFiles, '/simulator/inputs')
 api.add_resource(DownloadFiles, '/simulator/outputs')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
