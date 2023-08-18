@@ -62,9 +62,6 @@ class Outputs(Resource):
             else:
                 return send_file(file_path, as_attachment=True)
 
-        except Exception as e:
-            return str(e), 500
-
     def read_csv_and_convert_to_json(self, csv_path):
         json_data = []
         with open(csv_path, 'r', encoding='utf-8-sig') as csv_file:
@@ -78,4 +75,4 @@ api.add_resource(Inputs, '/simulator/inputs')
 api.add_resource(Outputs, '/simulator/outputs')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
