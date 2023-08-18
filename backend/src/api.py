@@ -50,9 +50,18 @@ class Inputs(Resource):
 class Outputs(Resource):
     def get(self):
         try:
-            csv_path = '/home/internship/backend/result/result.csv'  # CSV 파일 경로
-            json_data = self.read_csv_and_convert_to_json(csv_path)
-            return jsonify(json_data)
+            format_type = request.args.get('format')
+            file_path = '/home/internship/backend/result/result.csv'
+
+            if not os.path.exists(file_path):
+                return "File not found", 404
+
+            if format_type=='json':
+                json_data = self.read_csv_and_convert_to_json(file_path)
+                return jsonify(json_data)
+            else:
+                return send_file(file_path, as_attachment=True)
+
         except Exception as e:
             return str(e), 500
 
