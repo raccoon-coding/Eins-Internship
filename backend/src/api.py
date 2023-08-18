@@ -6,12 +6,36 @@ import os
 
 app = Flask(__name__)
 api = Api(app)
-    
-# TODO: 일부 파일의 변경이 들어올 때를 고려하기
-class UploadFiles(Resource):
-    def get(self):
-        return {'hello': 'world'}
 
+# Input 파일에 대한 API
+class Inputs(Resource):    
+    def get(self):
+        try:
+            format_type = request.args.get('format')
+            filename = request.args.get('name')
+            file_path = '/home/internship/backend/src/input/'+filename
+
+            if not os.path.exists(file_path):
+                return "File not found", 404
+
+            if format_type=='json':
+                json_data = self.read_csv_and_convert_to_json(file_path)
+                return jsonify(json_data)
+            else:
+                return send_file(file_path, as_attachment=True)
+
+        except Exception as e:
+            return str(e), 500
+
+    def read_csv_and_convert_to_json(self, csv_path):
+        json_data = []
+        with open(csv_path, 'r', encoding='utf-8-sig') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            for row in csv_reader:
+                json_data.append(row)
+        return json_data
+    
+    
     def post(self):
         try:
             files_list = request.files.getlist("file[]")
@@ -22,7 +46,8 @@ class UploadFiles(Resource):
         except Exception as e:
             return str(e), 400
 
-class DownloadFiles(Resource):
+# 결과 파일에 대한 API
+class Outputs(Resource):
     def get(self):
         try:
             csv_path = '/home/internship/backend/result/result.csv'  # CSV 파일 경로
@@ -40,8 +65,8 @@ class DownloadFiles(Resource):
         return json_data
 
 
-api.add_resource(UploadFiles, '/simulator/inputs')
-api.add_resource(DownloadFiles, '/simulator/outputs')
+api.add_resource(Inputs, '/simulator/inputs')
+api.add_resource(Outputs, '/simulator/outputs')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
