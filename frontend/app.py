@@ -10,8 +10,8 @@ import io
 app = Flask(__name__)
 api = Api(app)
 
-server_api_url = 'http://192.168.0.214:8010//simulator/inputs'
-return_server_api_url = 'http://192.168.0.214:8010/simulator/outputs'
+server_api_url = 'http://192.168.0.214:5000//simulator/inputs'
+return_server_api_url = 'http://192.168.0.214:5000/simulator/outputs'
 
 
 @app.route('/')
