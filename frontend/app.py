@@ -1,26 +1,17 @@
 from flask import Flask, render_template, request, jsonify, send_file
-import os
-from flask_restful import Api, Resource
-import csv
-from werkzeug.utils import secure_filename
+from flask_restful import Api
+import requests
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import io
 
 
 app = Flask(__name__)
 api = Api(app)
-file_name_list = list()
-number = 0
 
-
-def read_csv_and_convert_to_json(csv_path):
-    json_data = []
-    with open(csv_path, 'r', encoding='utf-8-sig') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            json_data.append(row)
-    return json_data
+server_api_url = 'http://192.168.0.214:8010//simulator/inputs'
+return_server_api_url = 'http://192.168.0.214:8010/simulator/outputs'
 
 
 @app.route('/')
@@ -30,51 +21,54 @@ def upload_file():
 
 @app.route('/scenario', methods=['GET', 'POST'])
 def scenario_uploads():
-    global number
     if request.method == 'POST':
         scenario = request.files.getlist("file[]")
-        if number == 0:
-            for i in scenario:
-                filename = os.getcwd() + "/save csv/" + secure_filename(i.filename)
-                i.save(filename)
-                number = number + 1
-                file_name_list.append(i.filename)
-        return render_template("scenario.html", number=number, scenario_name=file_name_list)
+        for file in scenario:
+            # CSV 파일만 업로드
+            if file.filename.endswith(".csv"):
+                with io.BytesIO() as f:
+                    file.save(f)
+                    contents = f.getvalue()
+                parameter = {
+                    "file[]": {
+                        file.name: contents
+                    }
+                }
+                requests.post(server_api_url, files=parameter)
+        parameter = {
+            "name": "all"
+        }
+        response = requests.get(server_api_url, params=parameter)
+        datas = response.json()
+        scenario_list = list()
+        for data in datas["files"]:
+            scenario_list.append(data)
+        return render_template("scenario.html", scenario_name=scenario_list)
     else:
-        if number != 0:
-            return render_template("scenario.html", number=number, scenario_name=file_name_list)
-        else:
-            return "you didn't send the file"
+        parameter = {
+            "name": "all"
+        }
+        response = requests.get(server_api_url, params=parameter)
+        datas = response.json()
+        scenario_list = list()
+        for data in datas["file_name"]:
+            scenario_list.append(data)
+        return render_template("scenario.html", scenario_name=scenario_list)
 
 
 @app.route('/result', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
-        directory_path = os.getcwd() + "/result"
-        for filename in os.listdir(directory_path):
-            if filename.endswith(".csv"):
-                file_path = os.path.join(directory_path, filename)
-                with open(file_path, 'rt') as f:
-                    csv_reader = csv.reader(f, delimiter=',')
-                    csv_data = list(csv_reader)
+        response = requests.get(return_server_api_url)
+        csv_data = response.json()
         return render_template("result.html", csv=csv_data)
     elif request.method == 'GET':
         try:
             format_type = request.args.get('format')
-            directory_path = os.getcwd() + "/result"
-            file_path = directory_path
-            for filename in os.listdir(directory_path):
-                if filename.endswith(".csv"):
-                    file_path = os.path.join(directory_path, filename)
-
-            if not os.path.exists(file_path):
-                return "File not found", 404
-
+            response = requests.get(return_server_api_url)
+            datas = response.json()
             if format_type == 'json':
-                json_data = read_csv_and_convert_to_json(file_path)
-                return jsonify(json_data)
-            else:
-                return send_file(file_path, as_attachment=True)
+                return render_template("JsonTable.html", json=datas)
 
         except Exception as e:
             return str(e), 500
@@ -83,14 +77,11 @@ def result():
 @app.route('/result_graph', methods=['POST', 'GET'])
 def result_graph():
     if request.method == 'POST':
-        directory_path = os.getcwd() + "/result"
+        response = requests.get(return_server_api_url)
+        csv_data = response.json()
+        #csv_data = request.files.getlist("file[]")
         dataframes = []
-
-        for filename in os.listdir(directory_path):
-            if filename.endswith(".csv"):
-                file_path = os.path.join(directory_path, filename)
-                csv_data = pd.read_csv(file_path)
-                dataframes.append(csv_data)
+        dataframes.append(csv_data)
 
         combined_data = pd.concat(dataframes, ignore_index=True)
         combined_data['날짜'] = pd.to_datetime(combined_data['날짜'])
@@ -114,23 +105,19 @@ def result_graph():
         return render_template("ResultGraph.html", graph_html=graph_html)
 
 
-@app.route('/detail/<int:file_name_number>/')
-def detail(file_name_number):
+@app.route('/detail/<string:file_name>/')
+def link_detail(file_name):
     format_type = request.args.get('format')
-    filename = os.getcwd() + "/save csv/"
-    file_path = filename + file_name_list[file_name_number]
-    with open(file_path, 'rt') as f:
-        csvd = csv.reader(f, delimiter=',')
-        csv_data = list(csvd)  # Read the entire CSV data into a list
-
-    if not os.path.exists(file_path):
-        return "File not found", 404
-
+    parameter = {
+        "name": file_name
+    }
+    response = requests.get(server_api_url, params=parameter)
+    datas = response.json()
     if format_type == 'json':
-        json_data = read_csv_and_convert_to_json(file_path)
-        return jsonify(json_data)
+        return render_template("JsonTable.html", json=datas)
     else:
-        return render_template("scenario_list.html", csv=csv_data)
+        return render_template("scenario_list.html", csv=datas)
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8000)
