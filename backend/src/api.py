@@ -7,19 +7,18 @@ import os
 app = Flask(__name__)
 api = Api(app)
 
-
 # Input 파일에 대한 API
-class Inputs(Resource):
+class Inputs(Resource):    
     def get(self):
         try:
             format_type = request.args.get('format')
             filename = request.args.get('name')
-            file_path = '/home/internship/backend/src/input/' + filename
+            file_path = '/home/internship/backend/src/input/'+filename
 
             if not os.path.exists(file_path):
                 return "File not found", 404
 
-            if format_type == 'json':
+            if format_type=='json':
                 json_data = self.read_csv_and_convert_to_json(file_path)
                 return jsonify(json_data)
             else:
@@ -36,18 +35,17 @@ class Inputs(Resource):
                 json_data.append(row)
         return json_data
     
+    
     def post(self):
         try:
             files_list = request.files.getlist("file[]")
             for file in files_list:
-                file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "input",
-                                         secure_filename(file.filename))
+                file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "input", secure_filename(file.filename))
                 file.save(file_path)
             return {'message': 'Input files uploaded successfully.'}
         except Exception as e:
             return str(e), 400
 
-          
 # 결과 파일에 대한 API
 class Outputs(Resource):
     def get(self):
@@ -58,7 +56,7 @@ class Outputs(Resource):
             if not os.path.exists(file_path):
                 return "File not found", 404
 
-            if format_type == 'json':
+            if format_type=='json':
                 json_data = self.read_csv_and_convert_to_json(file_path)
                 return jsonify(json_data)
             else:
