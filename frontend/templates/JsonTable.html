@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <style>
+        /* 스타일 추가 */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-2">
+        <table id="demo">
+            <tr>
+                <!-- JSON 데이터의 키를 테이블 헤더로 표시 -->
+                {% for key in json[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in json %}
+                <tr>
+                    <!-- 각 키에 해당하는 값들을 테이블 행에 표시 -->
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <form method="get" action="/scenario">
+            <button type="submit">Return</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -10,8 +10,8 @@ import io
 app = Flask(__name__)
 api = Api(app)
 
-server_api_url = 'http://192.168.0.214:5000//simulator/inputs'
-return_server_api_url = 'http://192.168.0.214:5000/simulator/outputs'
+server_api_url = 'http://127.0.0.1:5000//simulator/inputs'
+return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
 
 
 @app.route('/')
@@ -22,6 +22,7 @@ def upload_file():
 @app.route('/scenario', methods=['GET', 'POST'])
 def scenario_uploads():
     if request.method == 'POST':
+        
         scenario = request.files.getlist("file[]")
         for file in scenario:
             # CSV 파일만 업로드
@@ -30,18 +31,16 @@ def scenario_uploads():
                     file.save(f)
                     contents = f.getvalue()
                 parameter = {
-                    "file[]": {
-                        file.name: contents
-                    }
+                    "file[]": (file.filename, contents)
+                    
                 }
                 requests.post(server_api_url, files=parameter)
-        parameter = {
-            "name": "all"
-        }
+        
+        parameter = {"name": "all"}
         response = requests.get(server_api_url, params=parameter)
         datas = response.json()
         scenario_list = list()
-        for data in datas["files"]:
+        for data in datas:
             scenario_list.append(data)
         return render_template("scenario.html", scenario_name=scenario_list)
     else:
@@ -51,7 +50,7 @@ def scenario_uploads():
         response = requests.get(server_api_url, params=parameter)
         datas = response.json()
         scenario_list = list()
-        for data in datas["file_name"]:
+        for data in datas:
             scenario_list.append(data)
         return render_template("scenario.html", scenario_name=scenario_list)
 
@@ -113,10 +112,9 @@ def link_detail(file_name):
     }
     response = requests.get(server_api_url, params=parameter)
     datas = response.json()
-    if format_type == 'json':
-        return render_template("JsonTable.html", json=datas)
-    else:
-        return render_template("scenario_list.html", csv=datas)
+    print(datas)
+
+    return render_template("JsonTable.html", json=datas)
 
 
 if __name__ == '__main__':

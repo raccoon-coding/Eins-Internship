@@ -7,19 +7,24 @@ import os
 app = Flask(__name__)
 api = Api(app)
 
+
 # Input 파일에 대한 API
 class Inputs(Resource):    
-    dir_path='/home/internship/backend/src/input/'
-    files_list={}
+    dir_path='/home/temp/Eins-Internship/backend/src/input/'
 
     def get(self):
         try:
             format_type = request.args.get('format')
             filename = request.args.get('name')
-            if filename=='all':
-                return jsonify(self.files_list)
+            file_list=os.listdir(self.dir_path)
+            if filename=='all' or filename==None:
+                if len(file_list) == 0 :
+                    return jsonify({-1:"None"})
+                    
+                return file_list
+                #return jsonify({key:value for key, value in enumerate(file_list)})
             
-            file_path = self.dir_path + filename
+            file_path = self.dir_path + file_list[int(filename)]
             if not os.path.exists(file_path):
                 return "File not found", 404
             
@@ -37,23 +42,23 @@ class Inputs(Resource):
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
                 data.append(row)
+            print(data)
         return jsonify(data)
     
     def post(self):
         try:
-            self.files_list={}
-            files_list = request.files.getlist("file[]")
-            for index, file in enumerate(files_list):
+            list = request.files.getlist("file[]")
+            for file in list:
                 file_path = self.dir_path + secure_filename(file.filename)
                 file.save(file_path)
-                self.files_list[index]=file
-            return {'num_of_files': str(len(self.files_list))}
+                print('num_of_files : '+str(len(os.listdir(self.dir_path))))
+            return {'num_of_files': str(len(os.listdir(self.dir_path)))}
         except Exception as e:
             return str(e), 400
 
 # 결과 파일에 대한 API
 class Outputs(Resource):
-    file_path='/home/internship/backend/result/result.csv'
+    file_path='/home/temp/Eins-Internship/backend/result/result.csv'
 
     def get(self):
         try:
