@@ -77,10 +77,10 @@
         </tbody>
     </table>
     <form method="post" action="/result">
-        <button type="submit">Result_table</button>
+        <button type="submit" id="resultTableButton">Result_table</button>
     </form>
     <form method="post" action="/result_graph">
-        <button type="submit">Result_graph</button>
+        <button type="submit" id="resultGraphButton">Result_table</button>
     </form>
     <script>
         function displaySelectedFiles() {
@@ -99,6 +99,20 @@
         const fileInput = document.getElementById('fileInput');
         if (fileInput.files.length === 0) {
             alert('선택된 파일이 없습니다');
+            e.preventDefault(); // 폼 제출을 중단
+        }
+    });
+    document.getElementById('resultTableButton').addEventListener('click', function(e) {
+    const scenarioCount = {{ scenario_name|length|default(0) }};
+    if (scenarioCount < 10) {
+        alert('시나리오가 더 필요합니다. 최소 10개의 시나리오가 필요합니다.');
+        e.preventDefault(); // 폼 제출을 중단
+    }
+    });
+    document.getElementById('resultGraphButton').addEventListener('click', function(e) {
+        const scenarioCount = {{scenario_name | length | default(0)}};
+        if (scenarioCount < 10) {
+            alert('시나리오가 더 필요합니다. 최소 10개의 시나리오가 필요합니다.');
             e.preventDefault(); // 폼 제출을 중단
         }
     });
