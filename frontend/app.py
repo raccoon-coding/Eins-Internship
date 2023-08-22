@@ -1,3 +1,6 @@
+import csv
+import json
+from plotly.subplots import make_subplots
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_restful import Api
 import requests
@@ -10,13 +13,13 @@ import io
 app = Flask(__name__)
 api = Api(app)
 
-server_api_url = 'http://127.0.0.1:5000//simulator/inputs'
+server_api_url = 'http://127.0.0.1:5000/simulator/inputs'
 return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
 
 
 @app.route('/')
 def upload_file():
-    return render_template('upload.html')
+    return render_template('scenario.html')
 
 
 @app.route('/scenario', methods=['GET', 'POST'])
@@ -58,35 +61,56 @@ def scenario_uploads():
 @app.route('/result', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
-        response = requests.get(return_server_api_url)
-        csv_data = response.json()
-        return render_template("result.html", csv=csv_data)
+        parameter = {
+            "format": "json"
+        }
+        response = requests.get(return_server_api_url, params=parameter)
+        datas = response.json()
+        return render_template("result.html", json=datas)
     elif request.method == 'GET':
-        try:
-            format_type = request.args.get('format')
-            response = requests.get(return_server_api_url)
-            datas = response.json()
-            if format_type == 'json':
-                return render_template("JsonTable.html", json=datas)
-
-        except Exception as e:
-            return str(e), 500
+        parameter = {
+            "format": "csv"
+        }
+        response = requests.get(return_server_api_url, params=parameter)
+        parameter = {
+            "format": "json"
+        }
+        response = requests.get(return_server_api_url, params=parameter)
+        datas = response.json()
+        return render_template("result.html", json=datas)
 
 
 @app.route('/result_graph', methods=['POST', 'GET'])
 def result_graph():
     if request.method == 'POST':
-        response = requests.get(return_server_api_url)
-        csv_data = response.json()
-        #csv_data = request.files.getlist("file[]")
-        dataframes = []
-        dataframes.append(csv_data)
+        parameter = {
+            "format": "json"
+        }
+        response = requests.get(return_server_api_url, params=parameter)
+        json_data = response.json()
 
-        combined_data = pd.concat(dataframes, ignore_index=True)
-        combined_data['날짜'] = pd.to_datetime(combined_data['날짜'])
+        # CSV 파일로 변환
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # JSON 데이터에서 헤더를 추출하고 쓰기
+        header = json_data[0].keys() if json_data else []
+        writer.writerow(header)
+
+        # JSON 데이터의 각 행을 쓰기
+        for row in json_data:
+            writer.writerow(row.values())
+
+        # CSV 내용을 가져오고 응답으로 반환
+        csv_output = output.getvalue()
+        output.seek(0)  # CSV 읽기를 위해 커서를 파일 시작으로 이동
+        dataframe = pd.read_csv(output)
+        output.close()
+
+        dataframe['날짜'] = pd.to_datetime(dataframe['날짜'])
 
         # Group data by date
-        grouped_data = combined_data.groupby(combined_data['날짜'].dt.date)
+        grouped_data = dataframe.groupby(dataframe['날짜'].dt.date)
 
         fig = go.Figure()
         color_scale = px.colors.qualitative.Set1  # You can use any color palette
@@ -104,16 +128,15 @@ def result_graph():
         return render_template("ResultGraph.html", graph_html=graph_html)
 
 
+
 @app.route('/detail/<string:file_name>/')
-def link_detail(file_name):
+def detail(file_name):
     format_type = request.args.get('format')
     parameter = {
         "name": file_name
     }
     response = requests.get(server_api_url, params=parameter)
     datas = response.json()
-    print(datas)
-
     return render_template("JsonTable.html", json=datas)
 
 

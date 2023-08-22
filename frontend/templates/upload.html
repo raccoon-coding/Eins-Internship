@@ -66,6 +66,14 @@
                 selectedFilesDiv.appendChild(fileNameDiv);
             }
         }
+            // Submit 버튼 클릭 이벤트 핸들러
+    document.getElementById('submitButton').addEventListener('click', function (e) {
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files.length === 0) {
+            alert('선택된 파일이 없습니다');
+            e.preventDefault(); // 폼 제출을 중단
+        }
+    });
     </script>
 </body>
 </html>

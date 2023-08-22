@@ -9,26 +9,26 @@ api = Api(app)
 
 
 # Input 파일에 대한 API
-class Inputs(Resource):    
-    dir_path='/home/temp/Eins-Internship/backend/src/input/'
+class Inputs(Resource):
+    dir_path = '/home/temp/Eins-Internship/backend/src/input/'
 
     def get(self):
         try:
             format_type = request.args.get('format')
             filename = request.args.get('name')
-            file_list=os.listdir(self.dir_path)
-            if filename=='all' or filename==None:
-                if len(file_list) == 0 :
-                    return jsonify({-1:"None"})
-                    
+            file_list = os.listdir(self.dir_path)
+            if filename == 'all' or filename == None:
+                if len(file_list) == 0:
+                    return jsonify({-1: "None"})
+
                 return file_list
-                #return jsonify({key:value for key, value in enumerate(file_list)})
-            
+                # return jsonify({key:value for key, value in enumerate(file_list)})
+
             file_path = self.dir_path + file_list[int(filename)]
             if not os.path.exists(file_path):
                 return "File not found", 404
-            
-            if format_type=='csv':
+
+            if format_type == 'csv':
                 return send_file(file_path, as_attachment=True)
             else:
                 json_data = self.read_csv_and_convert_to_json(file_path)
@@ -44,30 +44,31 @@ class Inputs(Resource):
                 data.append(row)
             print(data)
         return jsonify(data)
-    
+
     def post(self):
         try:
             list = request.files.getlist("file[]")
             for file in list:
                 file_path = self.dir_path + secure_filename(file.filename)
                 file.save(file_path)
-                print('num_of_files : '+str(len(os.listdir(self.dir_path))))
+                print('num_of_files : ' + str(len(os.listdir(self.dir_path))))
             return {'num_of_files': str(len(os.listdir(self.dir_path)))}
         except Exception as e:
             return str(e), 400
 
+
 # 결과 파일에 대한 API
 class Outputs(Resource):
-    file_path='/home/temp/Eins-Internship/backend/result/result.csv'
+    file_path = '/home/temp/Eins-Internship/backend/result/result.csv'
 
     def get(self):
         try:
             format_type = request.args.get('format')
-            file_path=self.file_path
+            file_path = self.file_path
             if not os.path.exists(file_path):
                 return "File not found", 404
 
-            if format_type=='csv':
+            if format_type == 'csv':
                 return send_file(file_path, as_attachment=True)
             else:
                 json_data = self.read_csv_and_convert_to_json(file_path)
