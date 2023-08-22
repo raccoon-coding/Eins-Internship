@@ -7,8 +7,11 @@ package_dir = os.getcwd()
 
 # 결과 파일에 대한 API
 class OutputsApi(Resource):
+
+    #결과 파일 경로
     file_path = package_dir+'/result/result.csv'
 
+    #GET method
     def get(self):
         try:
             format_type = request.args.get('format')
@@ -24,6 +27,7 @@ class OutputsApi(Resource):
         except Exception as e:
             return str(e), 500
 
+    # csv to json 변환 함수
     def read_csv_and_convert_to_json(self, csv_path):
         data = []
         with open(csv_path, 'r', encoding='utf-8-sig') as csv_file:
