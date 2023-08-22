@@ -11,6 +11,11 @@ pandas == 2.0.3
 plotly == 5.16.1  
 
 ---
+# Sever Port
+Front Server Port : 8000
+Back Server Port : 5000
+
+---
 # Front End Flow Chat
 ![스크린샷 2023-08-22 오전 11 50 21](https://github.com/HarrysK99/Eins-Internship/assets/93311123/c7f173bd-d6a1-4f99-9b93-8e0dc1764e76)
 
@@ -22,7 +27,6 @@ plotly == 5.16.1
 ---
 # Full Stack Flow
 ![스크린샷 2023-08-22 오후 12 00 27](https://github.com/HarrysK99/Eins-Internship/assets/93311123/7b9042ef-bb14-4f69-a60e-c5c54a3ad752)
-
 
 
 ---
