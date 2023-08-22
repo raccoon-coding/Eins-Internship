@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Uploaded</title>
     <style>
-        /* 스타일 추가 */
         body {
             display: flex;
             flex-direction: column;
@@ -13,80 +12,106 @@
             height: 100vh;
             margin: 0;
         }
-
         form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: wrap;
+            max-width: 800px;
         }
 
-        #fileInputContainer {
-            margin-bottom: 10px;
-        }
-
-        #selectedFiles {
-            margin-top: 10px;
+        #fileInputContainer, #selectedFiles, #submitButtonContainer{
+            width: 100%;
             text-align: center;
         }
 
         #submitButtonContainer {
+            margin-top: -20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: -45px;
-            margin-left: 180px;
+            width: 100%;
+            text-align: center;
+            justify-content: center;
         }
 
-        #submitButton {
-            margin-top: 5px;
+        #selectedFiles {
+            margin-top: 10px;
+        }
+
+        @media screen and (min-width: 768px) {
+            #fileInputContainer {
+                width: 100%;
+            }
+
+            #submitButtonContainer {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                margin-top: -5px;
+                margin-left: 130px;
+            }
+
+            #submitButton {
+                display: flex;
+                margin-left: 10px;
+                margin-top: -30px;
+            }
         }
     </style>
 </head>
 <div class="container my-2">
     <form action="/scenario" method="POST" enctype="multipart/form-data">
         <div id="fileInputContainer">
-            <input type="file" name="file[]" multiple="multiple" id="fileInput" onchange="displaySelectedFiles()"/>
+            <input type="file" name="file[]" multiple="multiple" id="fileInput" onchange="displaySelectedFiles()" accept="text/csv"/>
         </div>
         <div id="selectedFiles"></div> <!-- 파일 이름들이 이곳에 나타나도록 수정 -->
         <div id="submitButtonContainer">
             <input type="submit" id="submitButton" value="Submit">
         </div>
     </form>
+    <form action="/reset" method="post">
+        <button type="submit">Reset</button>
+    </form>
+    <form id="deleteForm" action="/delete" method="POST">
     <table class="table">
         <thead>
-            <tr class="table-dark">
-                <th>번호</th>
-                <th>제목</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if scenario_name %}
-            {% for i in range(scenario_name|length) %}
-            <tr>
-                <td>{{ i + 1 }}</td>
-                <td>
-                    <a href="/detail/{{ i }}/">{{ scenario_name[i] }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td colspan="2">시나리오가 없습니다.</td>
-            </tr>
-            {% endif %}
-        </tbody>
+    <tr class="table-dark">
+        <th>체크</th>
+        <th>번호</th>
+        <th>제목</th>
+    </tr>
+</thead>
+<tbody>
+    {% if scenario_name %}
+    {% for i in range(scenario_name|length) %}
+    <tr>
+        <td><input type="checkbox" name="scenarios" class="scenarioCheckbox" value="{{ scenario_name[i] }}"></td>
+        <td>{{ i + 1 }}</td>
+        <td>
+            <a href="/detail/{{ i }}/">{{ scenario_name[i] }}</a>
+        </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="3">시나리오가 없습니다.</td>
+    </tr>
+    {% endif %}
+</tbody>
     </table>
+        <button type="button" id="deleteButton">삭제</button>
+    </form>
     <form method="post" action="/result">
         <button type="submit" id="resultTableButton">Result_table</button>
     </form>
     <form method="post" action="/result_graph">
-        <button type="submit" id="resultGraphButton">Result_table</button>
+        <button type="submit" id="resultGraphButton">Result_graph</button>
     </form>
+
     <script>
         function displaySelectedFiles() {
             const fileInput = document.getElementById('fileInput');
             const selectedFilesDiv = document.getElementById('selectedFiles');
             selectedFilesDiv.innerHTML = ''; // Clear previous selections
+            if (fileInput.files.length === 1) {
+                return;
+            }
 
             for (const file of fileInput.files) {
                 const fileNameDiv = document.createElement('div');
@@ -94,27 +119,35 @@
                 selectedFilesDiv.appendChild(fileNameDiv);
             }
         }
-            // Submit 버튼 클릭 이벤트 핸들러
     document.getElementById('submitButton').addEventListener('click', function (e) {
         const fileInput = document.getElementById('fileInput');
         if (fileInput.files.length === 0) {
             alert('선택된 파일이 없습니다');
-            e.preventDefault(); // 폼 제출을 중단
+            e.preventDefault();
         }
     });
     document.getElementById('resultTableButton').addEventListener('click', function(e) {
     const scenarioCount = {{ scenario_name|length|default(0) }};
     if (scenarioCount < 10) {
         alert('시나리오가 더 필요합니다. 최소 10개의 시나리오가 필요합니다.');
-        e.preventDefault(); // 폼 제출을 중단
+        e.preventDefault();
     }
     });
     document.getElementById('resultGraphButton').addEventListener('click', function(e) {
         const scenarioCount = {{scenario_name | length | default(0)}};
         if (scenarioCount < 10) {
             alert('시나리오가 더 필요합니다. 최소 10개의 시나리오가 필요합니다.');
-            e.preventDefault(); // 폼 제출을 중단
+            e.preventDefault();
         }
     });
+    document.getElementById('deleteButton').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.scenarioCheckbox:checked');
+    if (checkboxes.length === 0) {
+        alert('삭제할 시나리오를 선택하세요.');
+        return;
+    }
+
+    document.getElementById('deleteForm').submit();
+});
     </script>
 </div>

@@ -13,22 +13,27 @@ import io
 app = Flask(__name__)
 api = Api(app)
 
+# server url object
 server_api_url = 'http://127.0.0.1:5000/simulator/inputs'
 return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
 
 
+# Main view controller
 @app.route('/')
 def upload_file():
+    parameter = {
+        "name": "all"
+    }
+    requests.delete(server_api_url, params=parameter)
     return render_template('scenario.html')
 
 
+# A management controller that shows the input file list and connected view
 @app.route('/scenario', methods=['GET', 'POST'])
 def scenario_uploads():
     if request.method == 'POST':
-        
         scenario = request.files.getlist("file[]")
         for file in scenario:
-            # CSV 파일만 업로드
             if file.filename.endswith(".csv"):
                 with io.BytesIO() as f:
                     file.save(f)
@@ -58,6 +63,49 @@ def scenario_uploads():
         return render_template("scenario.html", scenario_name=scenario_list)
 
 
+# delete Controller
+@app.route('/delete', methods=['POST', 'GET'])
+def delete():
+    if request.method == 'POST':
+        scenarios = request.form.getlist('scenarios')
+        for scenario in scenarios:
+            parameter = {
+                "name": scenario
+            }
+            requests.delete(server_api_url, params=parameter)
+        parameter = {
+            "name": "all"
+        }
+        response = requests.get(server_api_url, params=parameter)
+        datas = response.json()
+        scenario_list = list()
+        for data in datas:
+            scenario_list.append(data)
+        return render_template("scenario.html", scenario_name=scenario_list)
+
+
+# Reset Controller
+@app.route('/reset', methods=['POST', 'GET'])
+def reset():
+    if request.method == 'POST':
+        parameter = {
+            "name": "all"
+        }
+        requests.delete(server_api_url, params=parameter)
+        parameter = {
+            "name": "all"
+        }
+        response = requests.get(server_api_url, params=parameter)
+        datas = response.json()
+        if datas['-1'] == 'None':
+            return render_template("scenario.html")
+        scenario_list = list()
+        for data in datas:
+            scenario_list.append(data)
+        return render_template("scenario.html", scenario_name=scenario_list)
+
+
+# A view controller that shows the result file in table
 @app.route('/result', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
@@ -71,7 +119,7 @@ def result():
         parameter = {
             "format": "csv"
         }
-        response = requests.get(return_server_api_url, params=parameter)
+        requests.get(return_server_api_url, params=parameter)
         parameter = {
             "format": "json"
         }
@@ -80,6 +128,7 @@ def result():
         return render_template("result.html", json=datas)
 
 
+# A view controller that shows the result file in graph
 @app.route('/result_graph', methods=['POST', 'GET'])
 def result_graph():
     if request.method == 'POST':
@@ -89,27 +138,22 @@ def result_graph():
         response = requests.get(return_server_api_url, params=parameter)
         json_data = response.json()
 
-        # CSV 파일로 변환
         output = io.StringIO()
         writer = csv.writer(output)
 
-        # JSON 데이터에서 헤더를 추출하고 쓰기
         header = json_data[0].keys() if json_data else []
         writer.writerow(header)
 
-        # JSON 데이터의 각 행을 쓰기
         for row in json_data:
             writer.writerow(row.values())
 
-        # CSV 내용을 가져오고 응답으로 반환
         csv_output = output.getvalue()
-        output.seek(0)  # CSV 읽기를 위해 커서를 파일 시작으로 이동
+        output.seek(0)
         dataframe = pd.read_csv(output)
         output.close()
 
         dataframe['날짜'] = pd.to_datetime(dataframe['날짜'])
 
-        # Group data by date
         grouped_data = dataframe.groupby(dataframe['날짜'].dt.date)
 
         fig = go.Figure()
@@ -128,7 +172,7 @@ def result_graph():
         return render_template("ResultGraph.html", graph_html=graph_html)
 
 
-
+# A view controller that shows the input file in table
 @app.route('/detail/<string:file_name>/')
 def detail(file_name):
     format_type = request.args.get('format')
@@ -140,5 +184,6 @@ def detail(file_name):
     return render_template("JsonTable.html", json=datas)
 
 
+# Frontend Sever start function in pont number 8000
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
