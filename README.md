@@ -1,93 +1,40 @@
+# Eins-Internship
+Internship mock-up project in Einssnc.
 ---
-description: API Introduction for mock-up project in Eins-Internship Program.
+# python module and library version
+
+python == 3.11.4  
+flask == 2.3.2  
+flask-restful == 0.3.10  
+request == 2.31.0  
+pandas == 2.0.3  
+plotly == 5.16.1  
+
 ---
+# Sever Port
+### Front Server Port : 8000  
+### Back Server Port : 5000
+### API docs : https://app.gitbook.com/s/kghF4HampzkBCZAMw3oK/~/revisions/UdImvGz9GT08XCcKbHXq/
+---
+# Front End Flow Chat
+![스크린샷 2023-08-22 오전 11 50 21](https://github.com/HarrysK99/Eins-Internship/assets/93311123/c7f173bd-d6a1-4f99-9b93-8e0dc1764e76)
 
-# Introduction
+---
+# Back End Flow Chat
+![스크린샷 2023-08-22 오전 11 51 13](https://github.com/HarrysK99/Eins-Internship/assets/93311123/a4e8acb1-2af2-4763-bd74-c5364dfaea8e)
 
-### Inputs API
 
-{% swagger method="get" path="" baseUrl="http://localhost:5000/simulator/inputs" summary="일부 시나리오 파일의 내용 혹은 시나리오 파일 목록을 불러옵니다." %}
-{% swagger-description %}
+---
+# Full Stack Flow
+![스크린샷 2023-08-22 오후 12 00 27](https://github.com/HarrysK99/Eins-Internship/assets/93311123/7b9042ef-bb14-4f69-a60e-c5c54a3ad752)
 
-{% endswagger-description %}
 
-{% swagger-parameter in="body" name="name" type="String" %}
-default : all
-{% endswagger-parameter %}
+---
+# Project Limitations
 
-{% swagger-parameter in="body" name="format" type="String" %}
-default : json
-{% endswagger-parameter %}
+1. Absence of DB
+Currently, the system is implemented in a structure that simply stores CSV files.
 
-{% swagger-response status="200: OK" description="파일/목록을 정상적으로 불러왔습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="404: Not Found" description="파일이 존재하지 않습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="500: Internal Server Error" description="서버 측에서 에러가 발생했습니다." %}
-
-{% endswagger-response %}
-{% endswagger %}
-
-{% swagger method="post" path="" baseUrl="http://localhost:5000/simulator/inputs" summary="Simulator 시나리오 파일을 등록합니다." %}
-{% swagger-description %}
-
-{% endswagger-description %}
-
-{% swagger-parameter in="body" name="files[]" type="file" required="true" %}
-
-{% endswagger-parameter %}
-
-{% swagger-response status="200: OK" description="시나리오 파일을 정상적으로 등록했습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="400: Bad Request" description="서버 측에서 에러가 발생했습니다." %}
-
-{% endswagger-response %}
-{% endswagger %}
-
-{% swagger method="delete" path="" baseUrl="http://localhost:5000/simulator/inputs" summary="일부 혹은 전체 시나리오 파일을 삭제합니다." %}
-{% swagger-description %}
-
-{% endswagger-description %}
-
-{% swagger-parameter in="body" name="name" type="String" %}
-default : all
-{% endswagger-parameter %}
-
-{% swagger-response status="200: OK" description="시나리오 파일을 정상적으로 삭제했습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="404: Not Found" description="해당 시나리오 파일이 존재하지 않습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="500: Internal Server Error" description="서버 측에서 에러가 발생했습니다." %}
-
-{% endswagger-response %}
-{% endswagger %}
-
-### Outputs API
-
-{% swagger method="get" path="" baseUrl="http://localhost:5000/simulator/outputs" summary="시뮬레이션 결과 파일 내용을 불러옵니다." %}
-{% swagger-description %}
-
-{% endswagger-description %}
-
-{% swagger-parameter in="body" name="format" type="String" %}
-default : json
-{% endswagger-parameter %}
-
-{% swagger-response status="200: OK" description="시뮬레이션 결과를 정상적으로 불러왔습니다." %}
-
-{% endswagger-response %}
-
-{% swagger-response status="500: Internal Server Error" description="서버 측에서 에러가 발생했습니다." %}
-
-{% endswagger-response %}
-{% endswagger %}
+2. Limitations of service scope
+Absence of user management system
+Therefore, there is only one scenario folder and one result folder.
