@@ -21,7 +21,7 @@ plotly == 5.16.1
 
 ---
 # Full Stack Flow
-![스크린샷 2023-08-22 오전 11 51 46](https://github.com/HarrysK99/Eins-Internship/assets/93311123/6abd3238-1f68-41fb-bb76-e5d27f77be34)
+![스크린샷 2023-08-22 오전 11 59 31](https://github.com/HarrysK99/Eins-Internship/assets/93311123/7c8e1ea4-599c-4b67-ad20-e51698c91953)
 
 
 ---
