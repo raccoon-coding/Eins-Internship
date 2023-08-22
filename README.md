@@ -3,12 +3,12 @@ Internship mock-up project in Einssnc.
 ---
 # python module and library version
 
-python == 3.11.4
-flask == 2.3.2
-flask-restful == 0.3.10
-request == 2.31.0
-pandas == 2.0.3
-plotly == 5.16.1
+python == 3.11.4  
+flask == 2.3.2  
+flask-restful == 0.3.10  
+request == 2.31.0  
+pandas == 2.0.3  
+plotly == 5.16.1  
 
 ---
 # Front End Flow Chat
