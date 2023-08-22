@@ -14,7 +14,7 @@ plotly == 5.16.1
 # Sever Port
 ### Front Server Port : 8000  
 ### Back Server Port : 5000
-### API docs : https://ksm3574s-organization.gitbook.io/untitled/
+### API docs : https://ksm3574s-organization.gitbook.io/untitled-1/
 ---
 # Front End Flow Chat
 ![스크린샷 2023-08-22 오전 11 50 21](https://github.com/HarrysK99/Eins-Internship/assets/93311123/c7f173bd-d6a1-4f99-9b93-8e0dc1764e76)
