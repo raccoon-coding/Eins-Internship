@@ -18,11 +18,6 @@ class InputsApi(Resource):
             #파라미터 확인
             format_type = request.args.get('format', 'json', str)
             filename = request.args.get('name', 'all', str)
-            reset=request.args.get('reset', False, bool)
-
-            #RESET
-            if reset :
-                self.delete_input_files(self.dir_path)
 
             #파일 목록 불러오기
             file_list = os.listdir(self.dir_path)
@@ -47,15 +42,36 @@ class InputsApi(Resource):
         except Exception as e:
             return str(e), 500
     
+    def delete(self):
+        try:
+            filename = request.args.get('name', 'all', str)
+
+            if filename=='all':
+                self.delete_all_files(self.dir_path)
+            else:     
+                file_path = self.dir_path + secure_filename(filename)
+                if os.path.exists(file_path):
+                    try:                      
+                        os.remove(file_path)
+                        return {'message': f'File {filename} deleted successfully.'}
+                    except Exception as e:
+                        return {'message': f'Failed to delete file {filename}. Reason: {str(e)}'}, 500
+                else:
+                    return {'message': f'File {filename} not found.'}, 404
+
+        #DELETE method 실패 응답
+        except Exception as e:
+            return str(e), 500
+            
     # input 파일 삭제 함수
-    def delete_input_files(self,directory_path):
+    def delete_all_files(self,directory_path):
         for filename in os.listdir(directory_path):
             file_path = os.path.join(directory_path, filename)
             try:
                 if os.path.isfile(file_path):
                     os.unlink(file_path)
                 elif os.path.isdir(file_path):
-                    self.delete_input_files(file_path)
+                    self.delete_all_files(file_path)
                     os.rmdir(file_path)
             
             except Exception as e:
