@@ -13,8 +13,8 @@ app = Flask(__name__)
 api = Api(app)
 
 # server url object
-server_api_url = 'http://127.0.0.1:8010/simulator/inputs'
-return_server_api_url = 'http://127.0.0.1:8010/simulator/outputs'
+server_api_url = 'http://127.0.0.1:5000/simulator/inputs'
+return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
 
 
 # Main view controller
