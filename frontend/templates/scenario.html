@@ -62,11 +62,11 @@
         </div>
         <div id="selectedFiles"></div> <!-- 파일 이름들이 이곳에 나타나도록 수정 -->
         <div id="submitButtonContainer">
-            <input type="submit" id="submitButton" value="Submit">
+            <input type="submit" id="submitButton" value="파일 업로드">
         </div>
     </form>
     <form action="/reset" method="post">
-        <button type="submit">Reset</button>
+        <button type="submit">업로드 파일 초기화</button>
     </form>
     <form id="deleteForm" action="/delete" method="POST">
     <table class="table">
@@ -95,13 +95,13 @@
     {% endif %}
 </tbody>
     </table>
-        <button type="button" id="deleteButton">삭제</button>
+        <button type="button" id="deleteButton">파일 삭제</button>
     </form>
     <form method="post" action="/result">
-        <button type="submit" id="resultTableButton">Result_table</button>
+        <button type="submit" id="resultTableButton">결과 보기</button>
     </form>
     <form method="post" action="/result_graph">
-        <button type="submit" id="resultGraphButton">Result_graph</button>
+        <button type="submit" id="resultGraphButton">결과 그래프 보기</button>
     </form>
 
     <script>
