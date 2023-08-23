@@ -1,6 +1,11 @@
 # Eins-Internship
 Internship mock-up project in Einssnc.
 ---
+
+# Internship period  
+### 2023.08.16 ~ 2023.08.31
+
+---
 # python module and library version
 
 python == 3.11.4  
