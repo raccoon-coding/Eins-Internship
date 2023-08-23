@@ -9,13 +9,12 @@ import plotly.express as px
 import pandas as pd
 import io
 
-
 app = Flask(__name__)
 api = Api(app)
 
 # server url object
-server_api_url = 'http://127.0.0.1:5000/simulator/inputs'
-return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
+server_api_url = 'http://127.0.0.1:8010/simulator/inputs'
+return_server_api_url = 'http://127.0.0.1:8010/simulator/outputs'
 
 
 # Main view controller
@@ -40,10 +39,10 @@ def scenario_uploads():
                     contents = f.getvalue()
                 parameter = {
                     "file[]": (file.filename, contents)
-                    
+
                 }
                 requests.post(server_api_url, files=parameter)
-        
+
         parameter = {"name": "all"}
         response = requests.get(server_api_url, params=parameter)
         datas = response.json()
@@ -116,16 +115,25 @@ def result():
         datas = response.json()
         return render_template("result.html", json=datas)
     elif request.method == 'GET':
-        parameter = {
-            "format": "csv"
-        }
-        requests.get(return_server_api_url, params=parameter)
-        parameter = {
-            "format": "json"
-        }
-        response = requests.get(return_server_api_url, params=parameter)
-        datas = response.json()
-        return render_template("result.html", json=datas)
+        if request.args.get('download') == 'True':
+            return file_download()
+        else:
+            parameter = {
+                "format": "json"
+            }
+            response = requests.get(return_server_api_url, params=parameter)
+            datas = response.json()
+            return render_template("result.html", json=datas)
+
+
+def file_download():
+    parameter = {
+        "format": "csv"
+    }
+    response = requests.get(return_server_api_url, params=parameter)
+    with open('result.csv', 'wb') as file:
+        file.write(response.content)
+    return send_file('result.csv', as_attachment=True, download_name='result.csv')
 
 
 # A view controller that shows the result file in graph
