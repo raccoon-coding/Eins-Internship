@@ -6,13 +6,13 @@
 
 </head>
 <body>
-
     <h1>CSV Data Graph</h1>
     <div id="graph">
         {{ graph_html | safe }}
     </div>
-<script>
+    <script>
     var ctx = document.getElementById('myLineChart').getContext('2d');
+    /* 그래프에 대한 스타일 정의 */
     var myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -33,7 +33,8 @@
             }
         }
     });
-</script>
+    </script>
+    <!-- 돌아가기 버튼 -->
     <form method="get" action="/scenario">
         <button type="submit">돌아가기</button>
     </form>

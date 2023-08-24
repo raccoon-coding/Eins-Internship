@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Uploaded</title>
     <style>
+        /* 여백과 Ui의 전체적인 위치를 설정하는 스타일 설정 */
         body {
             display: flex;
             flex-direction: column;
@@ -12,16 +13,17 @@
             height: 100vh;
             margin: 0;
         }
+        /* form에 포함된 버튼의 스타일 설정 */
         form {
             flex-wrap: wrap;
             max-width: 800px;
         }
-
+        /* 버틴, 파일 입력 UI를 포함하고 있는 컨테이너와 file name script의 스타일 설정*/
         #fileInputContainer, #selectedFiles, #submitButtonContainer{
             width: 100%;
             text-align: center;
         }
-
+        /* 제출 버튼의 컨테이너 설정 */
         #submitButtonContainer {
             margin-top: -20px;
             display: flex;
@@ -29,11 +31,11 @@
             text-align: center;
             justify-content: center;
         }
-
+        /* file name script의 설정 */
         #selectedFiles {
             margin-top: 10px;
         }
-
+        /* View page가 확장되었을 때, 컨테이너들의 변화점 */
         @media screen and (min-width: 768px) {
             #fileInputContainer {
                 width: 100%;
@@ -56,18 +58,21 @@
     </style>
 </head>
 <div class="container my-2">
+    <!-- 파일 입력 버튼 -->
     <form action="/scenario" method="POST" enctype="multipart/form-data">
         <div id="fileInputContainer">
             <input type="file" name="file[]" multiple="multiple" id="fileInput" onchange="displaySelectedFiles()" accept="text/csv"/>
         </div>
-        <div id="selectedFiles"></div> <!-- 파일 이름들이 이곳에 나타나도록 수정 -->
+        <div id="selectedFiles"></div> <!-- file name script가 여기에 나타나도록 설정 -->
         <div id="submitButtonContainer">
             <input type="submit" id="submitButton" value="파일 업로드">
         </div>
     </form>
+    <!-- 업로드 파일 초기화 버튼 -->
     <form action="/reset" method="post">
         <button type="submit">업로드 파일 초기화</button>
     </form>
+    <!-- 테이블의 시작과 동시에 form으로 감싸 삭제 버튼에 체크박스의 데이터가 같이 전달 되도록 코드 수정 -->
     <form id="deleteForm" action="/delete" method="POST">
     <table class="table">
         <thead>
@@ -81,6 +86,7 @@
     {% if scenario_name %}
     {% for i in range(scenario_name|length) %}
     <tr>
+        <!-- 체크박스 -->
         <td><input type="checkbox" name="scenarios" class="scenarioCheckbox" value="{{ scenario_name[i] }}"></td>
         <td>{{ i + 1 }}</td>
         <td>
@@ -97,6 +103,7 @@
     </table>
         <button type="button" id="deleteButton">파일 삭제</button>
     </form>
+    <!-- 업로드 시나리오에 대한 결과 테이블과 그래프 보는 버튼 -->
     <form method="post" action="/result">
         <button type="submit" id="resultTableButton">결과 보기</button>
     </form>
@@ -105,6 +112,7 @@
     </form>
 
     <script>
+        /* file name script의 함수 정의 */
         function displaySelectedFiles() {
             const fileInput = document.getElementById('fileInput');
             const selectedFilesDiv = document.getElementById('selectedFiles');
@@ -119,6 +127,7 @@
                 selectedFilesDiv.appendChild(fileNameDiv);
             }
         }
+        /* 제출 버튼의 함수 정의 (파일이 선택 안되었을 때) */
     document.getElementById('submitButton').addEventListener('click', function (e) {
         const fileInput = document.getElementById('fileInput');
         if (fileInput.files.length === 0) {
@@ -126,6 +135,7 @@
             e.preventDefault();
         }
     });
+    /* 결과 테이블 버튼 함수 정의 (시나리오가 10개가 안되었을 떄) */
     document.getElementById('resultTableButton').addEventListener('click', function(e) {
     const scenarioCount = {{ scenario_name|length|default(0) }};
     if (scenarioCount < 10) {
@@ -133,6 +143,7 @@
         e.preventDefault();
     }
     });
+    /* 결과 그래프 버튼 함수에 대한 정의 (시나리오가 10개가 안되었을 떄) */
     document.getElementById('resultGraphButton').addEventListener('click', function(e) {
         const scenarioCount = {{scenario_name | length | default(0)}};
         if (scenarioCount < 10) {
@@ -140,6 +151,7 @@
             e.preventDefault();
         }
     });
+    /* 파일 삭제 버튼 함수에 대한 정의(파일 체크가 안 되었을 때) */
     document.getElementById('deleteButton').addEventListener('click', function() {
     const checkboxes = document.querySelectorAll('.scenarioCheckbox:checked');
     if (checkboxes.length === 0) {
