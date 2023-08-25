@@ -8,7 +8,6 @@ frontend_dir = os.path.join(current_dir, '..', '..', '..')
 sys.path.insert(0, frontend_dir)
 from app import server_api_url
 
-
 def file_list_view():
     # Body in Json{"name":"all}
     parameter = {
