@@ -1,8 +1,8 @@
 from flask import Flask
 
 # server url object
-server_api_url = 'http://127.0.0.1:8010/simulator/inputs'
-return_server_api_url = 'http://127.0.0.1:8010/simulator/outputs'
+server_api_url = 'http://127.0.0.1:5000/simulator/inputs'
+return_server_api_url = 'http://127.0.0.1:5000/simulator/outputs'
 
 
 def create_app():
